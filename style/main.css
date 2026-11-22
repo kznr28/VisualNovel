@@ -43,14 +43,196 @@ button:hover {
  * ===========================
 **/
 
-/* Main Menu Styling */
-[data-screen="main"] {
+/* Title composition. Keep the backdrop independent of the text and controls. */
+main-screen[data-screen="main"] {
+  --gold: #ecd6a7;
+  --mincho: "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif CJK JP", "MS PMincho", serif;
+  --inset-left: max(9vw, calc(env(safe-area-inset-left, 0px) + 20px));
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #151d37;
+  color: #faf6ee;
+  text-align: left;
+}
+main-screen[data-screen="main"]::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(11,16,37,.81), rgba(21,23,44,.42) 33%, transparent 70%),
+    linear-gradient(0deg, rgba(14,16,33,.55), transparent 32%),
+    radial-gradient(ellipse at 78% 58%, rgba(244,159,126,.22), transparent 47%),
+    url("../assets/scenes/rooftop_night.webp") center / cover;
+}
+main-screen .title-layout {
+  box-sizing: border-box;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: clamp(26px, 6.5vh, 80px);
+  padding: max(24px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(36px, env(safe-area-inset-bottom)) var(--inset-left);
+}
+main-screen .title-logo { color: #faf6ee; }
+main-screen .title-logo p { margin: 0; }
+main-screen .title-kicker {
+  display: flex;
+  align-items: center;
+  gap: 1.1em;
+  color: var(--gold);
+  font: 500 clamp(10px, .8vw, 14px)/1.5 Georgia, serif;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+}
+main-screen .title-kicker::before {
+  content: "";
+  width: 2.8em;
+  height: 1px;
+  background: var(--gold);
+}
+main-screen .title-logo h1 {
+  color: inherit;
+  font: 400 clamp(50px, 6.3vw, 128px)/1.35 var(--mincho);
+  letter-spacing: .055em;
+  margin: .12em 0 .07em -.055em;
+}
+main-screen .title-reading {
+  color: #e6dfda;
+  font: italic clamp(17px, 1.5vw, 29px)/1.4 Georgia, serif;
+  letter-spacing: .13em;
+}
+main-screen main-menu {
+  position: static;
+  display: grid;
+  align-self: flex-start;
+  gap: 6px;
+  width: clamp(202px, 18vw, 320px);
+}
+main-screen main-menu button {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: clamp(8px, 1vh, 14px) 1.15em;
+  border: 1px solid rgba(226,215,195,.22);
+  border-left: 2px solid #9d9baa;
+  border-radius: 2px;
+  background: rgba(20,25,47,.58);
+  color: #f5f1e8;
+  font: 400 clamp(16px, 1.1vw, 22px)/1.4 var(--mincho);
+  letter-spacing: .13em;
+  text-align: left;
+  transition: background-color .2s, border-color .2s;
+}
+main-screen main-menu button::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border: 1px solid #bac0d1;
+  transform: rotate(45deg);
+}
+main-screen main-menu [data-action="start"] { border-left-color: var(--gold); }
+main-screen main-menu [data-action="start"]::before { background: var(--gold); border-color: var(--gold); }
+main-screen main-menu button span:first-child:empty { display: none; }
+@media (hover: hover) {
+  main-screen main-menu button:hover { background: #39415b; border-color: var(--gold); }
+}
+main-screen main-menu button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  background: #39415b;
+}
+main-screen .title-credit {
+  position: absolute;
+  right: max(4vw, calc(env(safe-area-inset-right) + 12px));
+  bottom: max(2.5vh, calc(env(safe-area-inset-bottom) + 4px));
+  color: #dfdbe0;
+  font: 12px/1.4 var(--mincho);
+  letter-spacing: .11em;
+}
+main-screen .first-star {
+  position: absolute;
+  pointer-events: none;
+  left: 77%;
+  top: 28%;
+  width: clamp(9px, 1.05vw, 21px);
+  aspect-ratio: 1;
+  filter: drop-shadow(0 0 5px #f4dc96);
+}
+main-screen .first-star::before {
+  content: "";
+  display: block;
+  height: 100%;
+  background: #fff1c8;
+  clip-path: polygon(50% 0, 57% 42%, 100% 50%, 57% 57%, 50% 100%, 43% 57%, 0 50%, 43% 42%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  main-screen.active::before { animation: hoshi-reveal .65s ease-out both; }
+  main-screen.active .title-logo { animation: hoshi-reveal .65s .08s both; }
+  main-screen.active main-menu { animation: hoshi-reveal .55s .16s both; }
+  main-screen.active .first-star { animation: hoshi-twinkle 6s ease-in-out infinite alternate; }
+}
+@media (prefers-reduced-motion: reduce) {
+  main-screen main-menu button { transition: none; }
+}
+@keyframes hoshi-reveal { from { opacity: 0; } to { opacity: 1; } }
+@keyframes hoshi-twinkle { from { opacity: .58; } to { opacity: 1; } }
 
+/* Safari's landscape toolbar can leave less than 300 CSS pixels in height. */
+@media (orientation: landscape) and (max-height: 520px) {
+  main-screen .title-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(155px, 25vw, 230px);
+    align-items: center;
+    gap: 18px;
+    padding: max(10px, env(safe-area-inset-top)) max(6vw, calc(env(safe-area-inset-right) + 12px)) max(28px, calc(env(safe-area-inset-bottom) + 8px)) max(6vw, calc(env(safe-area-inset-left) + 12px));
+  }
+  main-screen main-menu { width: 100%; align-self: center; gap: 4px; }
+  main-screen main-menu button { padding-block: 4px; }
+  main-screen .title-logo h1 { font-size: clamp(34px, 6.7vw, 64px); }
+  main-screen .title-kicker { font-size: 10px; letter-spacing: .17em; }
+  main-screen .title-kicker::before { width: 1.6em; }
+  main-screen .first-star { left: 60%; top: 21%; }
+  main-screen .title-credit { font-size: 10px; }
 }
 
-/* Main Menu Buttons Styling */
-[data-screen="main"] button {
-
+/* Monogatari creates this control only when the browser blocks autoplay. */
+[data-ui="broadcast"][data-content="allow-playback"] {
+  top: max(8px, env(safe-area-inset-top));
+  right: max(12px, calc(env(safe-area-inset-right) + 8px));
+  width: auto;
+  min-height: 44px;
+  padding: 0;
+  align-items: center;
+  background: rgba(17,23,46,.88);
+  border: 1px solid #787982;
+  border-radius: 2px;
+  color: #f1e4c8;
+  font: 14px/1.3 var(--mincho, serif);
+}
+[data-ui="broadcast"][data-content="allow-playback"] button {
+  padding: 0 14px;
+  margin: 0;
+  min-height: 44px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+[data-ui="broadcast"][data-content="allow-playback"] button:focus-visible {
+  outline: 2px solid #ecd6a7;
+  outline-offset: 1px;
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  [data-ui="broadcast"][data-content="allow-playback"] {
+    right: auto;
+    left: max(6vw, calc(env(safe-area-inset-left) + 12px));
+  }
 }
 
 /**

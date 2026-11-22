@@ -1,38 +1,43 @@
 'use strict';
 /* global Monogatari, monogatari */
 
-/**
- * =============================================================================
- * This is the file where you should put all your custom JavaScript code,
- * depending on what you want to do, there are 3 different places in this file
- * where you can add code.
- *
- * 1. Outside the $_ready function: At this point, the page may not be fully
- *    loaded yet, however you can interact with Monogatari to register new
- *    actions, components, labels, characters, etc.
- *
- * 2. Inside the $_ready function: At this point, the page has been loaded, and
- *    you can now interact with the HTML elements on it.
- *
- * 3. Inside the init function: At this point, Monogatari has been initialized,
- *    the event listeners for its inner workings have been registered, assets
- *    have been preloaded (if enabled) and your game is ready to be played.
- *
- * You should always keep the $_ready function as the last thing on this file.
- * =============================================================================
- **/
+const { $_ready } = Monogatari;
 
-const { $_ready, $_ } = Monogatari;
-
-// 1. Outside the $_ready function:
+// Localize the title even for returning players with the original English UI
+// preference. Keep Monogatari's button actions and stored preferences intact.
+const titleLabels = {
+	TitleStart: 'はじめから',
+	TitleLoad: 'ロード',
+	TitleSettings: '設定',
+	TitleHelp: '遊び方',
+	AllowPlayback: '音楽を再生',
+	NewContent: '更新があります。タップして再読み込み'
+};
+for (const language of ['日本語', 'English']) {
+	monogatari.translation(language, titleLabels);
+}
+const menu = monogatari.configuration('main-menu');
+const titleKeys = { Start: 'TitleStart', Load: 'TitleLoad', Settings: 'TitleSettings', Help: 'TitleHelp' };
+monogatari.configuration('main-menu', {
+	buttons: menu.buttons.map(button => ({ ...button, string: titleKeys[button.string] || button.string }))
+});
 
 monogatari.debug.level(5);
-
-$_ready (() => {
-	// 2. Inside the $_ready function:
-
-	monogatari.init ('#monogatari').then (() => {
-		// 3. Inside the init function:
-
+$_ready(() => {
+	// The engine inserts a clickable broadcast after an autoplay rejection.
+	// A native button also activates its delegated click handler via keyboard.
+	const root = document.querySelector('visual-novel');
+	const observer = new MutationObserver(records => {
+		for (const record of records) {
+			for (const node of record.addedNodes) {
+				if (!node.matches?.('[data-content="allow-playback"]')) continue;
+				const button = document.createElement('button');
+				button.type = 'button';
+				button.textContent = monogatari.string('AllowPlayback');
+				node.replaceChildren(button);
+			}
+		}
 	});
+	observer.observe(root, { childList: true });
+	monogatari.init('#monogatari');
 });
