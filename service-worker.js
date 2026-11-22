@@ -13,7 +13,7 @@ const cacheName = `${name}-v${version}`;
 // (everything under assets/) is cached on demand at runtime.
 const files = [
 
-	'/',
+	'./',
 
 	// General Files
 	'manifest.json',
@@ -201,7 +201,7 @@ self.addEventListener ('fetch', (event) => {
 
 	if (sameOrigin) {
 		// Game media: cache-first (large and effectively immutable per release).
-		if (url.pathname.startsWith ('/assets/')) {
+		if (url.pathname.startsWith (new URL ('assets/', self.registration.scope).pathname)) {
 			event.respondWith (cacheFirst (request));
 			return;
 		}
