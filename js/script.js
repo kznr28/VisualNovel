@@ -1,4 +1,4 @@
-/* global monogatari */
+/* global monogatari, scriptWithCharacterCues */
 'use strict';
 
 monogatari.assets('scenes', {
@@ -14,11 +14,20 @@ monogatari.assets('scenes', {
 monogatari.characters({
   a: {
     name: 'アオイ',
-    color: '#9bd3ff'
+    color: '#9bd3ff',
+    directory: 'aoi',
+    sprites: {
+      normal: 'normal.webp',
+      curious: 'curious.webp',
+      hopeful: 'hopeful.webp',
+      smile: 'smile.webp',
+      happy: 'happy.webp',
+      wistful: 'wistful.webp'
+    }
   }
 });
 
-monogatari.script({
+monogatari.script(scriptWithCharacterCues({
   Start: [
     'show scene library_twilight with fadeIn',
     '閉館間際の図書室。窓の外には、一番星が輝いていた。',
@@ -36,7 +45,9 @@ monogatari.script({
         Warning: '名前を入力してください。'
       }
     },
+    'show character a curious with fadeIn',
     'a {{player.name}}、まだ帰らないの？',
+    'show character a hopeful',
     'a 実は、屋上から流れ星を見たくて。',
     {
       Choice: {
@@ -54,18 +65,23 @@ monogatari.script({
   ],
   Rooftop: [
     'show scene rooftop_night with fadeIn',
+    'show character a normal',
     '夜風が二人の頬を撫でた。',
+    'show character a happy',
     'a ありがとう。{{player.name}}と一緒に見られてよかった。',
+    'show character a smile',
     '空を横切る光が、静かに願いを運んでいく。',
     '――エンディングA：星の約束',
     'end'
   ],
   Library: [
     'show scene library_night with fadeIn',
+    'show character a wistful',
     'a そっか。じゃあ、また明日ね。',
+    'hide character a with fadeOut',
     'ドアが閉まり、ページをめくる音だけが残った。',
     'あなたは窓の外の空を、もう一度見上げた。',
     '――エンディングB：静かな夜',
     'end'
   ]
-});
+}));

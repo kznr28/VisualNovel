@@ -111,8 +111,20 @@ button:hover {
 }
 
 /* Character Images Styles */
-[data-screen="game"] [data-character] {
-
+[data-screen="game"] img[data-character="a"] {
+  /* Upper-body framing, anchored to the actual game viewport in landscape. */
+  top: 0;
+  bottom: auto;
+  left: 33%;
+  right: auto;
+  margin: 0;
+  width: auto;
+  height: 185%;
+  max-height: none;
+  max-width: none;
+  translate: -50% 0;
+  pointer-events: none;
+  animation-duration: 280ms;
 }
 
 /* Other Images Styles */
