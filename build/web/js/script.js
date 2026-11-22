@@ -1,8 +1,16 @@
 /* global monogatari */
 'use strict';
 
-// ブラウザだけで試せる、画像素材不要のミニノベルです。
-// 背景は色コードで表示しています。画像を使う場合は README を参照。
+monogatari.assets('scenes', {
+  library_twilight: 'library_twilight.webp',
+  rooftop_night: 'rooftop_night.webp',
+  library_night: 'library_night.webp',
+  // 旧セーブはシーン命令の色コードを保持しているため、同じ背景に解決する。
+  '#142137': 'library_twilight.webp',
+  '#223c56': 'rooftop_night.webp',
+  '#2d263d': 'library_night.webp'
+});
+
 monogatari.characters({
   a: {
     name: 'アオイ',
@@ -12,7 +20,7 @@ monogatari.characters({
 
 monogatari.script({
   Start: [
-    'show scene #142137 with fadeIn',
+    'show scene library_twilight with fadeIn',
     '閉館間際の図書室。窓の外には、一番星が輝いていた。',
     {
       Input: {
@@ -45,7 +53,7 @@ monogatari.script({
     }
   ],
   Rooftop: [
-    'show scene #223c56 with fadeIn',
+    'show scene rooftop_night with fadeIn',
     '夜風が二人の頬を撫でた。',
     'a ありがとう。{{player.name}}と一緒に見られてよかった。',
     '空を横切る光が、静かに願いを運んでいく。',
@@ -53,7 +61,7 @@ monogatari.script({
     'end'
   ],
   Library: [
-    'show scene #2d263d with fadeIn',
+    'show scene library_night with fadeIn',
     'a そっか。じゃあ、また明日ね。',
     'ドアが閉まり、ページをめくる音だけが残った。',
     'あなたは窓の外の空を、もう一度見上げた。',
