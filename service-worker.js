@@ -4,7 +4,7 @@
 const name = 'Monogatari';
 
 // The cache version.
-const version = '0.1.2';
+const version = '0.1.3';
 
 // Name of the Cache Storage bucket this worker owns.
 const cacheName = `${name}-v${version}`;
@@ -13,7 +13,7 @@ const cacheName = `${name}-v${version}`;
 const musicCache = 'VisualNovel-music-v1';
 
 // Files precached on install so the game can boot offline. Game media
-// (everything under assets/) is cached on demand at runtime.
+// other than the title artwork and app icons is cached on demand at runtime.
 const files = [
 
 	'./',
@@ -41,21 +41,10 @@ const files = [
 
 	// App Images
 	'favicon.ico',
-	'assets/icons/icon_48x48.png',
-	'assets/icons/icon_60x60.png',
-	'assets/icons/icon_70x70.png',
-	'assets/icons/icon_76x76.png',
-	'assets/icons/icon_96x96.png',
-	'assets/icons/icon_120x120.png',
-	'assets/icons/icon_128x128.png',
-	'assets/icons/icon_150x150.png',
-	'assets/icons/icon_152x152.png',
-	'assets/icons/icon_167x167.png',
-	'assets/icons/icon_180x180.png',
-	'assets/icons/icon_192x192.png',
-	'assets/icons/icon_310x150.png',
-	'assets/icons/icon_310x310.png',
-	'assets/icons/icon_512x512.png'
+	'assets/icons/hoshi-180.png',
+	'assets/icons/hoshi-192.png',
+	'assets/icons/hoshi-512.png',
+	'assets/scenes/rooftop_night.webp'
 ];
 
 // Offline fallback, only ever returned for navigations that can't be served
