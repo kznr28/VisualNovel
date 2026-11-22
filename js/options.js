@@ -36,7 +36,7 @@ monogatari.settings({
 	'LanguageSelectionScreen': true,
 
 	// Music for the Main Menu.
-	'MainScreenMusic': '',
+	'MainScreenMusic': 'title_theme',
 
 	// Prefix for the Save Slots in Local Storage.
 	'SaveLabel': 'Save',
@@ -164,7 +164,7 @@ monogatari.preferences ({
 
 	// Initial Volumes from 0.0 to 1.
 	'Volume': {
-		'Music': 1,
+		'Music': 0.4,
 		'Voice': 1,
 		'Sound': 1,
 		'Video': 1
