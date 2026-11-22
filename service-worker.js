@@ -9,6 +9,9 @@ const version = '0.1.2';
 // Name of the Cache Storage bucket this worker owns.
 const cacheName = `${name}-v${version}`;
 
+// Bump this revision when replacing an MP3 with the same filename.
+const musicCache = 'VisualNovel-music-v1';
+
 // Files precached on install so the game can boot offline. Game media
 // (everything under assets/) is cached on demand at runtime.
 const files = [
@@ -34,6 +37,7 @@ const files = [
 	'js/script.js',
 	'js/character-cues.js',
 	'js/main.js',
+	'js/music.js',
 
 	// App Images
 	'favicon.ico',
@@ -160,11 +164,53 @@ async function cacheFirst (request) {
 	}
 }
 
+// Store one complete MP3 per URL. The menu's HTML audio element can request
+// byte ranges, while the story's Web Audio player requests the entire file.
+async function serveMusic (request) {
+	const cache = await caches.open (musicCache);
+	let audio = await cache.match (request.url);
+	if (!audio) {
+		// On first install a streaming player may already be using the network.
+		// Finish its open stream there instead of fetching a second full copy.
+		const range = request.headers.get ('Range');
+		if (range && !range.startsWith ('bytes=0-')) return fetch (request);
+		audio = await fetch (request.url);
+		if (audio.status !== 200) return audio;
+		try {
+			await cache.put (request.url, audio.clone ());
+		} catch (error) {
+			// Playback can still proceed when persistent storage is full.
+			console.warn ('Music cache unavailable', error);
+		}
+	}
+
+	const range = request.headers.get ('Range');
+	if (!range) return audio;
+	const match = /^bytes=(\d*)-(\d*)$/.exec (range);
+	if (!match || (!match[1] && !match[2])) return audio;
+
+	const blob = await audio.blob ();
+	const start = match[1] ? Number (match[1]) : Math.max (0, blob.size - Number (match[2]));
+	const end = match[1] && match[2] ? Math.min (Number (match[2]), blob.size - 1) : blob.size - 1;
+	if (start > end || start >= blob.size) {
+		return new Response (null, { status: 416, headers: { 'Content-Range': `bytes */${blob.size}` } });
+	}
+	return new Response (blob.slice (start, end + 1), {
+		status: 206,
+		headers: {
+			'Content-Type': 'audio/mpeg',
+			'Accept-Ranges': 'bytes',
+			'Content-Range': `bytes ${start}-${end}/${blob.size}`,
+			'Content-Length': String (end - start + 1)
+		}
+	});
+}
+
 self.addEventListener ('install', (event) => {
 	self.skipWaiting ();
 	event.waitUntil (
 		caches.open (cacheName).then ((cache) => {
-			return cache.addAll (files);
+			return cache.addAll (files.map (url => new Request (url, { cache: 'reload' })));
 		})
 	);
 });
@@ -175,7 +221,8 @@ self.addEventListener ('activate', (event) => {
 			return Promise.all (keyList.map ((key) => {
 				// Drop only this worker's own outdated caches; leave any other
 				// Cache Storage buckets untouched.
-				if (key.startsWith (`${name}-v`) && key !== cacheName) {
+				if ((key.startsWith (`${name}-v`) && key !== cacheName) ||
+					(key.startsWith ('VisualNovel-music-v') && key !== musicCache)) {
 					return caches.delete (key);
 				}
 			}));
@@ -201,6 +248,11 @@ self.addEventListener ('fetch', (event) => {
 	const sameOrigin = url.origin === self.location.origin;
 
 	if (sameOrigin) {
+		if (url.pathname.startsWith (new URL ('assets/music/', self.registration.scope).pathname)) {
+			event.respondWith (serveMusic (request));
+			return;
+		}
+
 		// Game media: cache-first (large and effectively immutable per release).
 		if (url.pathname.startsWith (new URL ('assets/', self.registration.scope).pathname)) {
 			event.respondWith (cacheFirst (request));
