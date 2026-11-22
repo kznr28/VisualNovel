@@ -27,10 +27,20 @@ $_ready(() => {
 	// The engine inserts a clickable broadcast after an autoplay rejection.
 	// A native button also activates its delegated click handler via keyboard.
 	const root = document.querySelector('visual-novel');
+	// When autoplay was blocked, let the first title interaction activate the
+	// engine's existing retry within the same browser gesture. Start goes
+	// directly to the scene score and the playback button handles itself.
+	const playbackPrompt = '[data-content="allow-playback"]';
+	root.addEventListener('click', event => {
+		if (!event.isTrusted || !event.target.closest?.('main-screen.active')) return;
+		if (event.target.closest('[data-action="start"]')) return;
+		root.querySelector(playbackPrompt)?.click();
+	}, true);
+
 	const observer = new MutationObserver(records => {
 		for (const record of records) {
 			for (const node of record.addedNodes) {
-				if (!node.matches?.('[data-content="allow-playback"]')) continue;
+				if (!node.matches?.(playbackPrompt)) continue;
 				const button = document.createElement('button');
 				button.type = 'button';
 				button.textContent = monogatari.string('AllowPlayback');
